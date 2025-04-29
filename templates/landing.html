@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronicleAI - Your Time-Traveling History Companion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            /* Light theme variables - more vibrant and modern */
+            --primary-color: #4361ee; /* Modern blue */
+            --secondary-color: #3a0ca3; /* Deep purple */
+            --accent-color: #f72585; /* Vibrant pink */
+            --text-color: #2b2d42; /* Dark blue-gray */
+            --light-bg: #f8f9fa; /* Clean light background */
+            --dark-bg: #212529; /* Rich dark background */
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --user-msg-bg: #e9ecef; /* Light gray for user messages */
+            --bot-msg-bg: #f8f9fa; /* Clean white for bot messages */
+            --welcome-bg: rgba(67, 97, 238, 0.1); /* Light blue with transparency */
+            --gradient-start: #4361ee;
+            --gradient-end: #3a0ca3;
+            --footer-bg: var(--dark-bg);
+            --footer-text: var(--accent-color);
+            --heading-color: var(--primary-color);
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme variables - more vibrant and modern */
+            --primary-color: #4cc9f0; /* Bright cyan */
+            --secondary-color: #7209b7; /* Vibrant purple */
+            --accent-color: #f72585; /* Vibrant pink */
+            --text-color: #e9ecef; /* Light gray */
+            --light-bg: #212529; /* Rich dark background */
+            --dark-bg: #121416; /* Darker background */
+            --card-bg: rgba(33, 37, 41, 0.95);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --user-msg-bg: #343a40; /* Dark gray for user messages */
+            --bot-msg-bg: #212529; /* Dark background for bot messages */
+            --welcome-bg: rgba(76, 201, 240, 0.1); /* Light cyan with transparency */
+            --gradient-start: #4cc9f0;
+            --gradient-end: #7209b7;
+            --footer-bg: #0F0F1A;
+            --footer-text: #FFD700;
+            --heading-color: var(--primary-color);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .landing-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .landing-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            z-index: 1;
+        }
+
+        /* Theme Toggle Styles */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-toggle i {
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle .sun-icon {
+            display: none;
+        }
+
+        .theme-toggle .moon-icon {
+            display: block;
+        }
+
+        [data-theme="dark"] .theme-toggle .sun-icon {
+            display: block;
+        }
+
+        [data-theme="dark"] .theme-toggle .moon-icon {
+            display: none;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            z-index: 10;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+            border-bottom: 3px solid var(--accent-color);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            font-family: 'Times New Roman', Times, serif;
+            letter-spacing: 2px;
+            transition: text-shadow 0.3s ease;
+        }
+
+        .header p {
+            font-style: italic;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            transition: color 0.3s ease;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--heading-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            position: relative;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            z-index: 1;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover {
+            color: var(--primary-color);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            color: var(--heading-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50px;
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            transition: all 0.3s ease;
+            color: var(--text-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-color);
+            opacity: 0.6;
+        }
+
+        .submit-button {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .submit-button i {
+            font-size: 1.2rem;
+        }
+
+        .form-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        .form-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            color: var(--heading-color);
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px var(--shadow-color);
+            transition: color 0.3s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            font-style: italic;
+            transition: color 0.3s ease;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1.2rem 2.5rem;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button:active {
+            transform: translateY(-1px);
+        }
+
+        .features-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            z-index: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px var(--shadow-color);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            color: var(--heading-color);
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .feature-description {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+
+        .about-section {
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 16px;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .about-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            z-index: 1;
+        }
+
+        .about-title {
+            font-size: 2.5rem;
+            color: var(--heading-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-color);
+        }
+
+        .about-image {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        .about-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 35px var(--shadow-color);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            margin-top: 3rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--heading-color);
+            transition: color 0.3s ease;
+        }
+
+        .footer-text {
+            font-style: italic;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .social-link {
+            color: var(--footer-text);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            color: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .features-section {
+                grid-template-columns: 1fr;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .about-image {
+                order: -1;
+            }
+            
+            .sidebar.open {
+                width: 100%;
+            }
+        }
+
+        .scroll-icon {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: bounce 2s infinite;
+            transition: color 0.3s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0) translateX(-50%);
+            }
+            40% {
+                transform: translateY(-20px) translateX(-50%);
+            }
+            60% {
+                transform: translateY(-10px) translateX(-50%);
+            }
+        }
+
+        /* Hamburger Menu Styles */
+        .hamburger-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .hamburger-button i {
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: var(--card-bg);
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            transition: left 0.3s ease;
+            padding: 20px;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .close-sidebar:hover {
+            transform: rotate(90deg);
+        }
+
+        .sidebar-menu {
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+        }
+
+        .sidebar-item:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .sidebar-item i {
+            font-size: 1.2rem;
+        }
+
+        /* Dark theme adjustments */
+        [data-theme="dark"] .sidebar {
+            background: var(--dark-bg);
+        }
+
+        [data-theme="dark"] .sidebar-item {
+            background: var(--dark-bg);
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu -->
+    <button class="hamburger-button" id="hamburgerMenu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <button class="close-sidebar" id="closeSidebar">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="sidebar-menu">
+            <a href="#" class="sidebar-item" id="sidebarLogin">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+            <a href="#" class="sidebar-item" id="sidebarSignup">
+                <i class="fas fa-user-plus"></i> Sign Up
+            </a>
+            <a href="/chat" class="sidebar-item">
+                <i class="fas fa-comments"></i> Start Chat
+            </a>
+        </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-sun sun-icon"></i>
+        <i class="fas fa-moon moon-icon"></i>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <button class="close-button" id="closeLoginModal">&times;</button>
+            <h2 class="modal-title">Login to ChronicleAI</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail" class="form-label">Email</label>
+                    <input type="email" id="loginEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword" class="form-label">Password</label>
+                    <input type="password" id="loginPassword" class="form-input" required>
+                </div>
+                <button type="submit" class="submit-button">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <div class="form-footer">
+                    Don't have an account? <a href="#" id="showSignupModal">Sign up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="modal" id="signupModal">
+        <div class="modal-content">
+            <button class="close-button" id="closeSignupModal">&times;</button>
+            <h2 class="modal-title">Create an Account</h2>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupName" class="form-label">Full Name</label>
+                    <input type="text" id="signupName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail" class="form-label">Email</label>
+                    <input type="email" id="signupEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword" class="form-label">Password</label>
+                    <input type="password" id="signupPassword" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupConfirmPassword" class="form-label">Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" class="form-input" required>
+                </div>
+                <button type="submit" class="submit-button">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </button>
+                <div class="form-footer">
+                    Already have an account? <a href="#" id="showLoginModal">Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="landing-container">
+        <header class="header">
+            <a href="/" class="logo">ChronicleAI</a>
+        </header>
+
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">ChronicleAI</h1>
+                <p class="hero-subtitle">Your Snarky Time-Traveling Companion Through History</p>
+                <a href="/chat" class="cta-button">
+                    <i class="fas fa-history"></i> Let's Dive Into History
+                </a>
+                <div class="scroll-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="feature-title">AI-Powered Insights</h3>
+                <p class="feature-description">
+                    Leveraging advanced AI to provide accurate, engaging, and sometimes snarky historical information at your fingertips.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-scroll"></i>
+                </div>
+                <h3 class="feature-title">Interactive Conversations</h3>
+                <p class="feature-description">
+                    Engage in natural conversations about any historical topic, from ancient civilizations to modern events.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3 class="feature-title">Time-Travel Ready</h3>
+                <p class="feature-description">
+                    Explore any era with our comprehensive knowledge base spanning thousands of years of human history.
+                </p>
+            </div>
+        </section>
+
+        <section class="about-section" id="aboutSection">
+            <h2 class="about-title">About ChronicleAI</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>
+                        ChronicleAI is your witty companion for exploring the fascinating world of history. Whether you're a student, history enthusiast, or just curious about the past, our AI-powered chatbot is here to make your historical journey both educational and entertaining.
+                    </p>
+                    <p>
+                        With a snarky personality and deep knowledge of historical events, figures, and contexts, ChronicleAI brings history to life in a unique way. Ask about ancient civilizations, medieval mysteries, or modern events - we've got you covered!
+                    </p>
+                    <p>
+                        Our advanced AI technology ensures accurate information while maintaining an engaging and conversational tone. So, ready to time-travel through history with a side of sass?
+                    </p>
+                </div>
+                <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Ancient books and scrolls" class="about-image">
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <h2 class="footer-title">ChronicleAI</h2>
+            <p class="footer-text">Your snarky sidekick for all things historical</p>
+            <div class="social-links">
+                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Hamburger Menu
+        const hamburgerButton = document.querySelector('.hamburger-button');
+        const sidebar = document.querySelector('.sidebar');
+        const closeSidebar = document.querySelector('.close-sidebar');
+        const sidebarLogin = document.getElementById('sidebarLogin');
+        const sidebarSignup = document.getElementById('sidebarSignup');
+
+        hamburgerButton.addEventListener('click', () => {
+            sidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        closeSidebar.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('active') && 
+                !sidebar.contains(e.target) && 
+                !hamburgerButton.contains(e.target)) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Handle sidebar item clicks
+        sidebarLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            loginModal.classList.add('show');
+        });
+
+        sidebarSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            signupModal.classList.add('show');
+        });
+
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        
+        // Check for saved theme preference or use default
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        htmlElement.setAttribute('data-theme', savedTheme);
+        
+        // Toggle theme on click
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Smooth scroll for the down arrow
+        document.querySelector('.scroll-icon').addEventListener('click', function() {
+            const featuresSection = document.querySelector('.features-section');
+            featuresSection.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Hide scroll icon after scrolling
+        window.addEventListener('scroll', function() {
+            const scrollIcon = document.querySelector('.scroll-icon');
+            if (window.scrollY > 100) {
+                scrollIcon.style.opacity = '0';
+            } else {
+                scrollIcon.style.opacity = '1';
+            }
+        });
+
+        // Modal Functionality
+        const loginModal = document.getElementById('loginModal');
+        const signupModal = document.getElementById('signupModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const closeSignupModal = document.getElementById('closeSignupModal');
+        const showSignupModal = document.getElementById('showSignupModal');
+        const showLoginModal = document.getElementById('showLoginModal');
+
+        // Close login modal
+        closeLoginModal.addEventListener('click', () => {
+            loginModal.classList.remove('show');
+        });
+
+        // Close signup modal
+        closeSignupModal.addEventListener('click', () => {
+            signupModal.classList.remove('show');
+        });
+
+        // Switch to signup modal
+        showSignupModal.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.classList.remove('show');
+            signupModal.classList.add('show');
+        });
+
+        // Switch to login modal
+        showLoginModal.addEventListener('click', (e) => {
+            e.preventDefault();
+            signupModal.classList.remove('show');
+            loginModal.classList.add('show');
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.remove('show');
+            }
+            if (e.target === signupModal) {
+                signupModal.classList.remove('show');
+            }
+        });
+
+        // Form submission handling
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Here you would typically send this data to your backend
+            console.log('Login attempt:', { email, password });
+            
+            // For demo purposes, just close the modal
+            loginModal.classList.remove('show');
+            
+            // Show success message (in a real app, you'd redirect to dashboard)
+            alert('Login successful! Redirecting to chat...');
+            window.location.href = '/chat';
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            // Here you would typically send this data to your backend
+            console.log('Signup attempt:', { name, email, password });
+            
+            // For demo purposes, just close the modal
+            signupModal.classList.remove('show');
+            
+            // Show success message (in a real app, you'd redirect to dashboard)
+            alert('Account created successfully! Redirecting to chat...');
+            window.location.href = '/chat';
+        });
+    </script>
+</body>
+</html> 

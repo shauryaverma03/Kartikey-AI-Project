@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronicleAI - Your Snarky History Sidekick</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            /* Light theme variables - more vibrant and modern */
+            --primary-color: #4361ee; /* Modern blue */
+            --secondary-color: #3a0ca3; /* Deep purple */
+            --accent-color: #f72585; /* Vibrant pink */
+            --text-color: #2b2d42; /* Dark blue-gray */
+            --light-bg: #f8f9fa; /* Clean light background */
+            --dark-bg: #212529; /* Rich dark background */
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --user-msg-bg: #e9ecef; /* Light gray for user messages */
+            --bot-msg-bg: #f8f9fa; /* Clean white for bot messages */
+            --welcome-bg: rgba(67, 97, 238, 0.1); /* Light blue with transparency */
+            --gradient-start: #4361ee;
+            --gradient-end: #3a0ca3;
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme variables - more vibrant and modern */
+            --primary-color: #4cc9f0; /* Bright cyan */
+            --secondary-color: #7209b7; /* Vibrant purple */
+            --accent-color: #f72585; /* Vibrant pink */
+            --text-color: #e9ecef; /* Light gray */
+            --light-bg: #212529; /* Rich dark background */
+            --dark-bg: #121416; /* Darker background */
+            --card-bg: rgba(33, 37, 41, 0.95);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --user-msg-bg: #343a40; /* Dark gray for user messages */
+            --bot-msg-bg: #212529; /* Dark background for bot messages */
+            --welcome-bg: rgba(76, 201, 240, 0.1); /* Light cyan with transparency */
+            --gradient-start: #4cc9f0;
+            --gradient-end: #7209b7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            z-index: 10;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+            border-bottom: 3px solid var(--accent-color);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            font-family: 'Times New Roman', Times, serif;
+            letter-spacing: 2px;
+            transition: text-shadow 0.3s ease;
+        }
+
+        .header p {
+            font-style: italic;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            transition: color 0.3s ease;
+        }
+
+        .chat-container {
+            flex: 1;
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .chat-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            z-index: 1;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--light-bg);
+            transition: scrollbar-color 0.3s ease;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--light-bg);
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.2rem;
+            border-radius: 18px;
+            max-width: 85%;
+            position: relative;
+            animation: fadeIn 0.5s ease-in-out;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            line-height: 1.5;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background-color: var(--user-msg-bg);
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .user-message:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow-color);
+        }
+
+        .bot-message {
+            background-color: var(--bot-msg-bg);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .bot-message:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow-color);
+        }
+
+        .bot-message::before {
+            content: '📜';
+            position: absolute;
+            left: -30px;
+            top: 10px;
+            font-size: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .user-message::before {
+            content: '👤';
+            position: absolute;
+            right: -30px;
+            top: 10px;
+            font-size: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .input-container {
+            display: flex;
+            gap: 1rem;
+            padding: 1.2rem;
+            background: var(--card-bg);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            border-radius: 0 0 16px 16px;
+            align-items: center; /* Ensure vertical alignment of all elements */
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 1rem 1.2rem;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50px;
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            transition: all 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+            color: var(--text-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding-left: 1.5rem; /* Add padding to avoid text overlap with the icon */
+        }
+
+        #user-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        button {
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .image-upload-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .image-upload-button i {
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+            color: var(--primary-color);
+            font-style: italic;
+            transition: color 0.3s ease;
+        }
+
+        .loading::after {
+            content: "...";
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60% { content: "..."; }
+            80%, 100% { content: ""; }
+        }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+            padding: 0.8rem;
+        }
+
+        .suggestion {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .suggestion:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .typing-indicator span {
+            height: 10px;
+            width: 10px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            animation: typing 1s infinite ease-in-out;
+            transition: background-color 0.3s ease;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(58, 12, 163, 0.1));
+            border-radius: 16px;
+            border: 1px solid rgba(67, 97, 238, 0.2);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+            50% { box-shadow: 0 4px 25px rgba(67, 97, 238, 0.2); }
+            100% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+        }
+
+        .welcome-message h2 {
+            color: var(--primary-color);
+            margin-bottom: 0.8rem;
+            transition: color 0.3s ease;
+            font-size: 1.8rem;
+        }
+
+        .welcome-message p {
+            font-style: italic;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+
+        .history-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: var(--accent-color);
+            animation: rotate 10s linear infinite;
+            transition: color 0.3s ease;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Hamburger Menu Styles */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .hamburger-button {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .hamburger-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .hamburger-button i {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .menu-items {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            padding: 0.8rem;
+            display: none;
+            min-width: 180px;
+            margin-top: 5px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .menu-items.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .menu-item {
+            padding: 0.8rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin-bottom: 0.3rem;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(58, 12, 163, 0.1));
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .menu-item i {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        /* Theme Toggle Styles */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-toggle i {
+            font-size: 1.5rem;
+            color: white;
+            transition: color 0.3s ease;
+        }
+
+        .theme-toggle .sun-icon {
+            display: none;
+        }
+
+        .theme-toggle .moon-icon {
+            display: block;
+        }
+
+        [data-theme="dark"] .theme-toggle .sun-icon {
+            display: block;
+        }
+
+        [data-theme="dark"] .theme-toggle .moon-icon {
+            display: none;
+        }
+
+        /* Adjust existing styles */
+        .chat-container {
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .history-content {
+                width: 95%;
+                padding: 1rem;
+            }
+            
+            .theme-toggle {
+                right: 70px;
+            }
+        }
+
+        /* Try Again Button Styles */
+        .try-again-button {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: fit-content;
+        }
+
+        .try-again-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .try-again-button:active {
+            transform: translateY(0);
+        }
+
+        .try-again-button i {
+            margin-right: 8px;
+        }
+
+        /* History Modal Styles */
+        .history-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            backdrop-filter: blur(5px);
+        }
+
+        .history-modal.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .history-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease;
+        }
+
+        .history-header h2 {
+            color: var(--primary-color);
+            margin: 0;
+            transition: color 0.3s ease;
+            font-size: 1.8rem;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 0.5rem;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-button:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .history-item {
+            padding: 1.2rem;
+            background: var(--light-bg);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .history-item:hover {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(58, 12, 163, 0.1));
+            transform: translateX(5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-item .timestamp {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            opacity: 0.8;
+            transition: color 0.3s ease;
+            font-weight: bold;
+        }
+
+        .history-item .preview {
+            margin-top: 0.8rem;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+            line-height: 1.5;
+        }
+
+        .clear-history-button {
+            margin-top: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .clear-history-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .clear-history-button i {
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-sun sun-icon"></i>
+        <i class="fas fa-moon moon-icon"></i>
+    </div>
+
+    <div class="hamburger-menu" id="hamburgerMenu">
+        <button class="hamburger-button">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="menu-items" id="menuItems">
+            <a href="#" class="menu-item" id="newChatOption">
+                <i class="fas fa-plus"></i> New Chat
+            </a>
+            <a href="#" class="menu-item" id="historyOption">
+                <i class="fas fa-history"></i> History
+            </a>
+        </div>
+    </div>
+
+    <div class="history-modal" id="historyModal">
+        <div class="history-content">
+            <div class="history-header">
+                <h2>Chat History</h2>
+                <button class="close-button" onclick="hideHistory()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="history-list" id="historyList">
+                <!-- History items will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <div class="header">
+        <h1>ChronicleAI</h1>
+        <p>Your Snarky History Sidekick</p>
+    </div>
+
+    <div class="chat-container">
+        <i class="fas fa-scroll history-icon"></i>
+        <div class="chat-messages" id="chat-messages">
+            <div class="welcome-message">
+                <h2>Welcome to ChronicleAI!</h2>
+                <p>Your time-traveling companion through the annals of history.</p>
+            </div>
+            <div class="message bot-message">
+                Hey there, history buff! I'm ChronicleAI, your snarky sidekick for digging up the past. Ready to unearth some old-school drama, roast a few dead kings, or figure out why everyone back then had such terrible haircuts? Let's hit the rewind button—what's your time-travel target?
+            </div>
+            <div class="suggestions">
+                <div class="suggestion" onclick="useSuggestion(this)">Tell me about Ancient Egypt</div>
+                <div class="suggestion" onclick="useSuggestion(this)">Who was the most interesting historical figure?</div>
+                <div class="suggestion" onclick="useSuggestion(this)">What happened in 1066?</div>
+                <div class="suggestion" onclick="useSuggestion(this)">Why did the Roman Empire fall?</div>
+            </div>
+        </div>
+        <div class="typing-indicator" id="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="loading" id="loading">Thinking</div>
+        <div class="input-container">
+            <label for="image-upload" class="image-upload-button">
+                <i class="fas fa-image"></i>
+            </label>
+            <input type="file" id="image-upload" accept="image/*" style="display: none;">
+            <input type="text" id="user-input" placeholder="Ask me anything about history..." autocomplete="off">
+            <button onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        
+        // Check for saved theme preference or use default
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        htmlElement.setAttribute('data-theme', savedTheme);
+        
+        // Toggle theme on click
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const loading = document.getElementById('loading');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const imageUploadInput = document.getElementById('image-upload');
+
+        // Focus input on page load
+        window.onload = function() {
+            userInput.focus();
+        };
+
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function useSuggestion(element) {
+            userInput.value = element.textContent;
+            userInput.focus();
+        }
+
+        function addMessage(message, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addSuggestions() {
+            const suggestionsDiv = document.createElement('div');
+            suggestionsDiv.className = 'suggestions';
+            
+            const suggestions = [
+                "Tell me about the Renaissance",
+                "What caused World War I?",
+                "Who was Cleopatra?",
+                "What was life like in medieval Europe?"
+            ];
+            
+            suggestions.forEach(suggestion => {
+                const suggestionElement = document.createElement('div');
+                suggestionElement.className = 'suggestion';
+                suggestionElement.textContent = suggestion;
+                suggestionElement.onclick = function() { useSuggestion(this); };
+                suggestionsDiv.appendChild(suggestionElement);
+            });
+            
+            chatMessages.appendChild(suggestionsDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // Add user message to chat
+            addMessage(message, true);
+            userInput.value = '';
+            
+            // Show typing indicator
+            typingIndicator.style.display = 'flex';
+            loading.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (!data || !data.response) {
+                    throw new Error('Invalid response format from server');
+                }
+                
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+                
+                // Add bot response
+                addMessage(data.response, false);
+                
+                // Add new suggestions after bot response
+                addSuggestions();
+
+                // Add Try Again button after the chat
+                addTryAgainButton();
+
+                // Save both user message and bot response to chat history
+                saveToHistory(message, data.response);
+            } catch (error) {
+                console.error('Error:', error);
+                typingIndicator.style.display = 'none';
+                
+                let errorMessage = 'Sorry, there was an error processing your request.';
+                
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
+                } else if (error.message.includes('HTTP error')) {
+                    errorMessage = 'The server is currently unavailable. Please try again later.';
+                } else if (error.message.includes('Invalid response')) {
+                    errorMessage = 'Received an invalid response from the server. Please try again.';
+                }
+                
+                addMessage(errorMessage, false);
+                addMessage('You can try asking your question again or choose one of the suggested topics below.', false);
+                addSuggestions();
+                
+                // Add Try Again button after the error messages
+                addTryAgainButton();
+            }
+        }
+
+        // Image Upload Functionality
+        imageUploadInput.addEventListener('change', async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Display the uploaded image in the chat
+            const imageUrl = URL.createObjectURL(file);
+            const imageMessage = document.createElement('div');
+            imageMessage.className = 'message user-message';
+            imageMessage.innerHTML = `<img src="${imageUrl}" alt="Uploaded Image" style="max-width: 100%; border-radius: 8px;">`;
+            chatMessages.appendChild(imageMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Show typing indicator
+            typingIndicator.style.display = 'flex';
+            loading.style.display = 'none';
+
+            try {
+                // Prepare form data for the image
+                const formData = new FormData();
+                formData.append('image', file);
+
+                // Send the image to the server
+                const response = await fetch('/api/image', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!data || !data.response) {
+                    throw new Error('Invalid response format from server');
+                }
+
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+
+                // Add bot response
+                addMessage(data.response, false);
+
+                // Add new suggestions after bot response
+                addSuggestions();
+
+                // Add Try Again button after the chat
+                addTryAgainButton();
+
+                // Save to history
+                saveToHistory('Image uploaded', data.response);
+            } catch (error) {
+                console.error('Error:', error);
+                typingIndicator.style.display = 'none';
+
+                let errorMessage = 'Sorry, there was an error processing your image.';
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
+                } else if (error.message.includes('HTTP error')) {
+                    errorMessage = 'The server is currently unavailable. Please try again later.';
+                } else if (error.message.includes('Invalid response')) {
+                    errorMessage = 'Received an invalid response from the server. Please try again.';
+                }
+
+                addMessage(errorMessage, false);
+                addMessage('You can try uploading another image or choose one of the suggested topics below.', false);
+                addSuggestions();
+
+                // Add Try Again button after the error messages
+                addTryAgainButton();
+            } finally {
+                // Reset the file input
+                imageUploadInput.value = '';
+            }
+        });
+
+        // Function to add Try Again button
+        function addTryAgainButton() {
+            // Remove any existing Try Again button
+            const existingButton = document.querySelector('.try-again-button');
+            if (existingButton) {
+                existingButton.remove();
+            }
+            
+            // Create and add new Try Again button
+            const tryAgainButton = document.createElement('button');
+            tryAgainButton.className = 'try-again-button';
+            tryAgainButton.innerHTML = '<i class="fas fa-redo"></i> Try Again';
+            tryAgainButton.onclick = tryAgain;
+            
+            // Insert the button after the chat messages
+            chatMessages.appendChild(tryAgainButton);
+            
+            // Scroll to the bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function saveToHistory(userMessage, botResponse) {
+            const chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+            
+            // Get the exact current date and time
+            const now = new Date();
+            
+            // Create a new chat entry for each conversation with the exact timestamp
+            const currentChat = {
+                timestamp: now.getTime(), // Save as milliseconds since epoch for more precise timing
+                messages: [
+                    {
+                        text: userMessage,
+                        isUser: true,
+                        timestamp: now.getTime()
+                    },
+                    {
+                        text: botResponse,
+                        isUser: false,
+                        timestamp: now.getTime()
+                    }
+                ],
+                preview: userMessage
+            };
+            
+            // Add the new chat to history
+            chatHistory.push(currentChat);
+            
+            // Save to localStorage
+            localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+        }
+
+        // Hamburger Menu Functions
+        function toggleMenu() {
+            const menuItems = document.getElementById('menuItems');
+            menuItems.classList.toggle('show');
+        }
+
+        // Add click event listener to hamburger button
+        document.querySelector('.hamburger-button').addEventListener('click', toggleMenu);
+
+        // Add click event listeners to menu items
+        document.getElementById('newChatOption').addEventListener('click', startNewChat);
+        document.getElementById('historyOption').addEventListener('click', showHistory);
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menuItems = document.getElementById('menuItems');
+            const hamburgerButton = document.querySelector('.hamburger-button');
+            
+            if (!menuItems.contains(event.target) && !hamburgerButton.contains(event.target)) {
+                menuItems.classList.remove('show');
+            }
+        });
+
+        // New Chat Function
+        function startNewChat() {
+            // Clear chat messages
+            chatMessages.innerHTML = '';
+            
+            // Add welcome message and initial bot message
+            const welcomeMessage = document.createElement('div');
+            welcomeMessage.className = 'welcome-message';
+            welcomeMessage.innerHTML = `
+                <h2>Welcome to ChronicleAI!</h2>
+                <p>Your time-traveling companion through the annals of history.</p>
+            `;
+            
+            const botMessage = document.createElement('div');
+            botMessage.className = 'message bot-message';
+            botMessage.textContent = "Hey there, history buff! I'm ChronicleAI, your snarky sidekick for digging up the past. Ready to unearth some old-school drama, roast a few dead kings, or figure out why everyone back then had such terrible haircuts? Let's hit the rewind button—what's your time-travel target?";
+            
+            chatMessages.appendChild(welcomeMessage);
+            chatMessages.appendChild(botMessage);
+            addSuggestions();
+            
+            // Clear input
+            userInput.value = '';
+            
+            // Close menu
+            toggleMenu();
+        }
+
+        // History Functions
+        function showHistory() {
+            const historyModal = document.getElementById('historyModal');
+            const historyList = document.getElementById('historyList');
+            
+            // Clear existing history items
+            historyList.innerHTML = '';
+            
+            // Get chat history from localStorage
+            const chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+            
+            // Sort history by timestamp (newest first)
+            chatHistory.sort((a, b) => b.timestamp - a.timestamp);
+            
+            // Add history items
+            chatHistory.forEach((chat, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                // Format the timestamp with exact date and time
+                const date = new Date(chat.timestamp);
+                const formattedDate = date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+                
+                historyItem.innerHTML = `
+                    <div class="timestamp">${formattedDate}</div>
+                    <div class="preview">${chat.preview}</div>
+                `;
+                historyItem.onclick = () => loadChat(index);
+                historyList.appendChild(historyItem);
+            });
+            
+            // Add clear history button
+            const clearButton = document.createElement('button');
+            clearButton.className = 'clear-history-button';
+            clearButton.innerHTML = '<i class="fas fa-trash"></i> Clear History';
+            clearButton.onclick = clearHistory;
+            historyList.appendChild(clearButton);
+            
+            historyModal.classList.add('show');
+            toggleMenu();
+        }
+
+        function hideHistory() {
+            const historyModal = document.getElementById('historyModal');
+            historyModal.classList.remove('show');
+        }
+
+        function loadChat(index) {
+            const chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+            
+            // Sort history by timestamp (newest first) to match the display order
+            chatHistory.sort((a, b) => b.timestamp - a.timestamp);
+            
+            const chat = chatHistory[index];
+            
+            if (chat) {
+                // Clear current chat
+                chatMessages.innerHTML = '';
+                
+                // Load chat messages
+                chat.messages.forEach(msg => {
+                    addMessage(msg.text, msg.isUser);
+                });
+                
+                // Hide history modal
+                hideHistory();
+            }
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all chat history? This cannot be undone.')) {
+                localStorage.removeItem('chatHistory');
+                showHistory(); // Refresh the history display
+            }
+        }
+
+        function tryAgain() {
+            // Clear chat messages
+            chatMessages.innerHTML = '';
+            
+            // Add welcome message and initial bot message
+            const welcomeMessage = document.createElement('div');
+            welcomeMessage.className = 'welcome-message';
+            welcomeMessage.innerHTML = `
+                <h2>Welcome to ChronicleAI!</h2>
+                <p>Your time-traveling companion through the annals of history.</p>
+            `;
+            
+            const botMessage = document.createElement('div');
+            botMessage.className = 'message bot-message';
+            botMessage.textContent = "Hey there, history buff! I'm ChronicleAI, your snarky sidekick for digging up the past. Ready to unearth some old-school drama, roast a few dead kings, or figure out why everyone back then had such terrible haircuts? Let's hit the rewind button—what's your time-travel target?";
+            
+            chatMessages.appendChild(welcomeMessage);
+            chatMessages.appendChild(botMessage);
+            addSuggestions();
+            
+            // Clear input
+            userInput.value = '';
+            
+            // Close menu
+            toggleMenu();
+        }
+    </script>
+</body>
+</html>
